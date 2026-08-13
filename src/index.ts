@@ -2,6 +2,7 @@ import { config } from "./config";
 import { initDb, getSession, insertSession } from "./db";
 import { parseSession, PARSERS } from "./parsers";
 import { renderError, renderLanding, renderNotFound, renderSession } from "./render";
+import { decompressZstd, isZstd } from "./zstd";
 
 const db = initDb(config.dataDir);
 
@@ -25,9 +26,24 @@ async function handlePost(req: Request, url: URL): Promise<Response> {
     return json({ error: "Payload too large", max_bytes: config.maxBody }, 413);
   }
 
-  const text = await req.text();
-  if (Buffer.byteLength(text) > config.maxBody) {
+  const buf = Buffer.from(await req.arrayBuffer());
+  if (buf.length > config.maxBody) {
     return json({ error: "Payload too large", max_bytes: config.maxBody }, 413);
+  }
+  if (buf.length === 0) {
+    return json({ error: "Empty body — POST a JSONL session file." }, 400);
+  }
+
+  // DeepSeek Harness session files are zstd-compressed; transparently inflate.
+  let text: string;
+  if (isZstd(buf)) {
+    try {
+      text = decompressZstd(buf);
+    } catch (err) {
+      return json({ error: `Could not decompress zstd payload: ${err instanceof Error ? err.message : String(err)}` }, 400);
+    }
+  } else {
+    text = buf.toString("utf8");
   }
   if (!text.trim()) {
     return json({ error: "Empty body — POST a JSONL session file." }, 400);

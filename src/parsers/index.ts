@@ -2,9 +2,10 @@ import type { Parser, SessionIR } from "../ir";
 import { pairToolResults } from "../ir";
 import { claudeParser } from "./claude";
 import { codebuddyParser } from "./codebuddy";
+import { dshParser } from "./dsh";
 import { piParser } from "./pi";
 
-export const PARSERS: Parser[] = [piParser, claudeParser, codebuddyParser];
+export const PARSERS: Parser[] = [piParser, claudeParser, codebuddyParser, dshParser];
 
 export function labelOf(format: string): string {
   return PARSERS.find((p) => p.id === format)?.label ?? format;

@@ -15,6 +15,10 @@ build step, no external services.
   | Claude Code | `claude-code` | `~/.claude/projects/<dir>/<sid>.jsonl` |
   | CodeBuddy Code | `codebuddy` | `~/.codebuddy/projects/<hash>/<sid>.jsonl` |
   | Pi | `pi` | `~/.pi/agent/sessions/<dir>/<ts>_<uuid>.jsonl` |
+  | DeepSeek Harness | `dsh` | `~/.dsh/sessions/<dir>/<sid>/session.jsonl.zstd` |
+
+  DeepSeek Harness files are zstd-compressed — POST the `.jsonl.zstd` file
+  directly and it is decompressed transparently (concatenated zstd frames).
 - Renders a clean transcript: user/assistant turns, collapsible **thinking**,
   **tool calls** with their results paired together, markdown (fenced code,
   lists, headings, inline code), model + token stats.
@@ -146,3 +150,8 @@ git config commit.template .gitmessage
   `providerData.messageId`.
 - **Pi** starts with a `type: "session"` header, then `type: "message"` entries
   whose `message.role` is `user`/`assistant`/`toolResult`/`bashExecution`/…
+- **DeepSeek Harness** stores a `type: "session"` header (with `createdAt`,
+  `delegationDepth`), then `/`-namespaced events (`user/message`,
+  `assistant/message`, `tool/call` + `tool/result` matched by `callId`,
+  `request/header` for the model). Streaming chunk and approval/command events
+  are ignored; the assembled `assistant/message` carries reasoning + text.

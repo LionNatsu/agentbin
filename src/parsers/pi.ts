@@ -171,7 +171,8 @@ export const piParser: Parser = {
   sniff(obj) {
     let s = 0;
     const t = obj.type;
-    if (t === "session") s += 10;
+    // Pi's header has an ISO `timestamp`; DSH's `session` header uses `createdAt`.
+    if (t === "session" && typeof obj.timestamp === "string") s += 10;
     if (t === "message" && obj.message && typeof obj.message === "object") {
       const m = obj.message as Record<string, unknown>;
       if (typeof m.role === "string") s += 6;

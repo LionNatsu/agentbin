@@ -500,8 +500,10 @@ function renderOutput(title: string, bodyText: string, isError?: boolean): strin
 </details>`;
 }
 
+const SHELLISH_TOOL = /^(bash|pwsh|powershell|sh|zsh|cmd|terminal|exec|run|shell)$/i;
+
 function toolInputText(name: string, input: unknown): string {
-  if (name.toLowerCase() === "bash" && input && typeof input === "object") {
+  if (SHELLISH_TOOL.test(name) && input && typeof input === "object") {
     const cmd = (input as Record<string, unknown>).command;
     if (typeof cmd === "string" && cmd) return `$ ${cmd}`;
   }

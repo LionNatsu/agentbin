@@ -17,6 +17,9 @@ describe("format detection", () => {
   test("detects Pi", () => {
     expect(parseSession(fixture("pi.jsonl")).format).toBe("pi");
   });
+  test("detects DeepSeek Harness", () => {
+    expect(parseSession(fixture("dsh.jsonl")).format).toBe("dsh");
+  });
   test("rejects garbage", () => {
     expect(() => parseSession("hello\nworld\n")).toThrow();
   });
@@ -78,5 +81,35 @@ describe("pi parsing", () => {
     if (tool?.kind !== "toolUse") throw new Error("expected toolUse");
     expect(tool.name).toBe("bash");
     expect(tool.result?.content).toContain("total 8");
+  });
+});
+
+describe("dsh parsing", () => {
+  const ir = parseSession(fixture("dsh.jsonl")).ir;
+
+  test("extracts metadata and model", () => {
+    expect(ir.sessionId).toBe("dsh-demo");
+    expect(ir.cwd).toBe("D:\\repo\\demo");
+    expect(ir.model).toBe("deepseek-v4-pro");
+    expect(ir.title).toBe("Add a health endpoint");
+  });
+
+  test("renders reasoning and pairs tool result by callId", () => {
+    const user = ir.events.find((e) => e.kind === "user");
+    expect(user?.kind).toBe("user");
+    if (user?.kind !== "user") throw new Error("expected user");
+    expect(user.text).toBe("Add a /health endpoint to the server.");
+
+    const assistants = ir.events.filter((e) => e.kind === "assistant");
+    expect(assistants.length).toBe(2);
+
+    const first = assistants[0] as Extract<typeof assistants[0], { kind: "assistant" }>;
+    expect(first.blocks.some((b) => b.kind === "thinking")).toBe(true);
+    const tool = first.blocks.find((b) => b.kind === "toolUse");
+    if (tool?.kind !== "toolUse") throw new Error("expected toolUse");
+    expect(tool.name).toBe("pwsh");
+    expect(tool.result?.content).toBe("done");
+    // The standalone toolResult event was consumed by pairing.
+    expect(ir.events.some((e) => e.kind === "toolResult")).toBe(false);
   });
 });
