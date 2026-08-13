@@ -75,18 +75,20 @@ may be sensitive, so pages are only reachable via their link.
 
 ```
 src/
-  index.ts          Bun.serve entrypoint + routing
+  index.ts          Bun.serve entrypoint + routing (zstd-aware POST)
   config.ts         env config
   db.ts             bun:sqlite schema + helpers
   ir.ts             normalized IR types + tool-result pairing
   markdown.ts       tiny dependency-free markdown renderer
   render.ts         server-side HTML (CSS + landing + transcript)
   util.ts           escape / format helpers
+  zstd.ts           concatenated-frame Zstandard decompression (DSH sessions)
   parsers/
     index.ts        registry + auto-detection (score-based sniffing)
     claude.ts       Claude Code dialect
     codebuddy.ts    CodeBuddy Code (flat OpenAI-Responses-shaped events)
     pi.ts           Pi (session header + message tree)
+    dsh.ts          DeepSeek Harness (/ -namespaced events, callId pairing)
     helpers.ts      shared content/usage normalizers
 ```
 
