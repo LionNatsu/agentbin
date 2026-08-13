@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Runtime data (SQLite database lives here)
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Build output
+dist/
+
+# Env / secrets
+.env
+.env.*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
