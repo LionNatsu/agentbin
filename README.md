@@ -109,6 +109,32 @@ bun test           # parser tests against fixtures/
 bun run typecheck  # tsc --noEmit
 ```
 
+## Conventional commits
+
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+```
+
+- **type** — `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+- **scope** — optional module/area, e.g. `parsers`, `render`, `db`, `api`
+- **subject** — imperative, lowercase, ≤ 72 chars, no trailing period
+
+Examples:
+
+```
+feat(parsers): add CodeBuddy Code session format
+fix(render): escape model name in session badge
+docs(readme): document conventional commits
+```
+
+A `.gitmessage` template is provided. Enable it per-repo (or globally) with:
+
+```bash
+git config commit.template .gitmessage
+```
+
 ## Notes on format differences
 
 - **Claude Code** stores an Anthropic-Messages-shaped transcript: top-level
